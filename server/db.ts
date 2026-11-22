@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
-import { CONFIG } from './config';
+import { CONFIG, IS_RAILWAY } from './config';
 import {
   AuditLogEntry,
   PurchaseRequest,
@@ -74,6 +74,10 @@ class Database {
     console.log('[Database] Seeding initial database with default records...');
     const defaultPasswordHash = bcrypt.hashSync('password123', 10);
 
+    const baseUrl = IS_RAILWAY
+      ? `https://${process.env.RAILWAY_STATIC_URL || 'procura-api.up.railway.app'}`
+      : `http://localhost:${CONFIG.PORT}`;
+
     const seededUsers: UserWithAuth[] = DEFAULT_PORTAL_PROFILES.map((u) => ({
       ...u,
       passwordHash: defaultPasswordHash
@@ -81,7 +85,7 @@ class Database {
 
     const seededOffers: SupplierOffer[] = INITIAL_OFFERS.map((o) => ({
       ...o,
-      fileUrl: `http://localhost:${CONFIG.PORT}/uploads/${o.fileName}`
+      fileUrl: `${baseUrl}/uploads/${o.fileName}`
     }));
 
     const initialDb: DatabaseSchema = {

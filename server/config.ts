@@ -3,6 +3,10 @@ import path from 'path';
 
 dotenv.config();
 
+// Railway persistent volume path
+const RAILWAY_VOLUME = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data';
+const IS_RAILWAY = process.env.RAILWAY_ENVIRONMENT === 'production';
+
 export const CONFIG = {
   PORT: process.env.PORT ? parseInt(process.env.PORT, 10) : 4000,
   API_PREFIX: '/api/v1',
@@ -10,7 +14,7 @@ export const CONFIG = {
   JWT_EXPIRES_IN: '7d',
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
   GEMINI_MODEL: process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
-  DATA_DIR: path.resolve(process.cwd(), 'server', 'data'),
-  UPLOADS_DIR: path.resolve(process.cwd(), 'server', 'uploads'),
+  DATA_DIR: IS_RAILWAY ? path.join(RAILWAY_VOLUME, 'data') : path.resolve(process.cwd(), 'server', 'data'),
+  UPLOADS_DIR: IS_RAILWAY ? path.join(RAILWAY_VOLUME, 'uploads') : path.resolve(process.cwd(), 'server', 'uploads'),
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000'
 };
